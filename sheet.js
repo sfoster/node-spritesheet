@@ -1,3 +1,4 @@
+// npm install gd and promised-io into a node_modules directory
 var sys  = require('sys');
 var fs   = require('fs');
 var path = require('path');
@@ -17,9 +18,11 @@ var	files = [],
 	sequence = null;
 	
 function run() {
+	// remove preexisting output file at the target path
 	if (path.exists(target)) 
 	  fs.unlink(target);
 
+	// populate the files array with paths to all .png images
 	fs.readdir(indir, function(err, filenames){
 		files = filenames.filter(function(name){
 			return name.charAt(0) != '.' 
@@ -54,7 +57,7 @@ function createSheet(files, dest, options) {
 		},
 		next: function(){
 			var file = files.shift();
-			console.log("next, with: " + file);
+			// console.log("next, with: " + file);
 			if(file) {
 				copyIntoImage(target_png, file, i++)
 					.then(sequence.next);
@@ -89,11 +92,20 @@ function copyIntoImage(target_png, sourcefile, i){
 			icon_width, // width/height to copy
 			icon_height
 		);
-
+		console.log(
+			"\tbackground-position: " + 0 +" "+ (i * icon_height * -1) +"px;"
+			+"\t"
+			+"/* "+sourcefile+" */"
+			);
 		// release mem for the source icon img
 		sourcePng.destroy();
+
+		// indicate completion of this async operation
+		// by resolving the promise we returned earlier
 		pr.resolve(path + " copied");
 	});
+
+	// return a promise, which we'll resolve when the openPng is done
 	return pr;
 }
 
