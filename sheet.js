@@ -54,13 +54,16 @@ function createSheet(files, dest, options) {
 	var file = null, 
 		count = files.length, 
 		i = 0, 
-		target_png = gd.createTrueColor(icon_width, icon_height * count)
+		target_png = gd.createTrueColor(icon_width, icon_height * count);
+
+  target_png.saveAlpha(1);
+  target_png.alphaBlending(0);
 
 	console.log("target_png created");
 
 	// on object to manage an async sequence. 
 	// TODO: can use https://github.com/sfoster/dojo-samiam/blob/master/sandbox/Sequence.js ? 
-	sequence = {
+	var sequence = {
 		start: function(){
 			console.log("start sequence");
 			console.log("target_png has width:height: " + icon_width +" : "+ icon_height * count);
@@ -93,7 +96,6 @@ function copyIntoImage(target_png, sourcefile, i){
 	var pr = promise.Promise();
 	gd.openPng(sourcefile, function(sourcePng, path) {
 		// console.log("source img: " + sourcefile + ", copy to: 0/"+ (i * icon_height));
-		
 		sourcePng.copy(
 			target_png, // into where (?)
 			0,	// destination x
