@@ -6,8 +6,16 @@ var gd   = require('gd/gd');
 var promise   = require('promised-io/promise');
 
 // TODO: accept cmd arg or config for input directory
-var indir = "./test/icons", 
-	target = './test/sprite.png';
+var usage = "sheet.js path/to/icons";
+
+var args = process.argv.slice(1); 
+if(args[0].match(/\.js$/)){
+  args.shift(); // ignore the application's filename
+}
+
+var cwd = process.cwd(); 
+var indir = (args.shift() || cwd).replace(/\/$/, '');
+var target = args.shift() || indir+'/sprite.png';
 
 // TODO: config or read source images for width/height	
 // define icons sizes
@@ -30,8 +38,11 @@ function run() {
 		}).map(function(name){
 			return indir + "/" + name;
 		});
-
-		// console.log("got files: " + JSON.stringify(files));
+		// filter out the target png file if it was already in there
+    if(files.indexOf(target) > -1){
+      files.splice(files.indexOf(target), 1);
+    }
+		// console.log("got files: \n" + files.join("\n"));
 
 		return createSheet(files, target, {});
 	});
@@ -110,5 +121,7 @@ function copyIntoImage(target_png, sourcefile, i){
 }
 
 if(require.main === module) {
+	console.log("indir: " + indir);
+	console.log("target: " + target);
 	run();
 }
